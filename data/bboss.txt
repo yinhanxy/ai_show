@@ -1,0 +1,260 @@
+refactor(omss): 灰名单实时推送改为同步直调并增强日志
+ALTER TABLE omss_rds.`iot_gray_customer`
+    MODIFY COLUMN `cert_code` VARCHAR(512) DEFAULT NULL COMMENT '客户证件编码';
+ALTER TABLE omss_rds.`iot_gray_customer_his`
+    MODIFY COLUMN `cert_code` VARCHAR(512) DEFAULT NULL COMMENT '客户证件编码';
+
+
+
+https://freemodel.dev/dashboard/keys  fe_oa_25fc69025da9b392f4c641c7f1235d1a3a8cd35419ef69f6
+省公司地址：https://ip:port/api/v2/sync/BBOSS/CGrayECSync
+onelink地址：https://ip:port/api/v2/sync/BBOSS/OLGrayECSync
+CMIOT地址： https://ip:port/api/v版本号/sync/bizOrder/GrayECSync
+
+fix(idc): 修复 PubIDCOrderAuditService 中 auditStaff 为空导致的 NPE
+SELECT * FROM eai.eai_route_config  WHERE api_uri LIKE '%ABSCustInfoServ_OS%';  api_id 主键ID;关联 eai_api_config 字段
+SELECT * FROM eai.eai_api_config;
+
+/EAI/tsn/cust/sync/custMgmtStatusSync
+
+生产：bboss-1
+开发：kf
+curl -H "Content-Type: application/json" -X POST  http://abs-svc-tools.bboss-1:9261/db/encryption/encrypt -d '{"dataSourceName":"omss_rds","tableName":"iot_gray_customer","primaryKey":"record_id","fieldsToEncrypt": ["cert_code"],"pageSize":1000}'
+
+91321000840737216
+
+完成CMIOT平台，省BOSS平台实时传输灰名单新增/删除信息功能；
+
+ sudo chown -R appop:appop grayec
+COMPANY_NUM
+companyNum
+feat(abs-svc-job): 
+支持“省份”查询，展示列表新增省份字段;
+针对“物联网白名单工单”类型工单，工单标题取值逻辑调整为“白名单类型”;
+
+处理生成环境IDC驱动后使用老的流程图找不到节点的问题；
+feat(cabs-data-check): 新增灰名单(GRAYEC)反馈文件导入接口,支持按月份回刷
+
+
+feat(omss): 新增行业灰名单客户月全量文件生成任务
+每月25日生成三端（CMIOT / OneLink / 省 BOSS）月全量文件，
+用于客户数据一致性比对。
+核心特性：
+- 整文件单 JSON 格式（fileBody 数组）
+- 5MB 切片 + 001~999 序号
+- 两阶段提交 + 跨切片回滚 + 启动清理残留 .tmp
+- taxNum SM4 加密（参数表取密钥，缺失回落默认值）
+- oprSeq 文件内流水序号
+- 分页稳定排序（ORDER BY record_id ASC）
+- 日志双写本地 + XXL-JOB（含完整堆栈）
+
+/abs_data/absfile/omss/grayec/month_all_out/
+├── province_boss/
+│   ├── SYN.GRAYECyyyyMM.省份1.ALL.001
+│   ├── SYN.GRAYECyyyyMM.省份2.ALL.001
+│   └── ...
+├── cmiot/
+│   └── SYN.GRAYECyyyyMM.ALL.001
+└── onelink/
+    └── SYN.GRAYECyyyyMM.ONELINK.ALL.001
+
+/abs_data/absfile/omss/grayec/month_all_out/
+├── province_boss/
+├── cmiot/
+└── onelink/
+
+
+@hermes发包助手 
+企微账号：殷晗
+服务名: abs-svc-cust
+部署环境：225-lt
+程序包地址：http://172.19.30.153:32095/repository/devops-raw-host/abs_svc_cust/20260518000042/abs_svc_cust.tar.gz
+
+@hermes发包助手 
+企微账号：殷晗
+服务名: ops-omss-maintenance
+部署环境：225-lt
+程序包地址：http://172.19.30.153:32095/repository/devops-raw-host/ops_omss_maintenance/20260518000046/ops_omss_maintenance.tar.gz
+
+@hermes发包助手 
+企微账号：殷晗
+服务名: abs-job-handler
+部署环境：225-lt
+程序包地址：http://172.19.30.153:32095/repository/devops-raw-host/abs_job_handler/20260518000047/abs_job_handler.tar.gz
+
+@hermes发包助手 
+企微账号：殷晗
+服务名: abs-svc-job
+部署环境：225-lt
+程序包地址：http://172.19.30.153:32095/repository/devops-raw-host/abs_svc_job/20260518000048/abs_svc_job.tar.gz
+
+apifox令牌：afxp_6792c93xOeLi4lztgoNR0EZfBceZurVSwISz
+
+refactor(iotWhiteCustomer): 行业灰名单命中查询改为专用SQL
+
+feat(whitelist): 风险白名单新增前增加行业灰名单命中校验
+在新增车联网/大流量/免开卡审核（whiteEcType=11/12/18）风险白名单时，
+先通过 omss-maintenance 查询证件编码是否命中本省行业灰名单，
+命中则拦截并返回违规原因，防止违规客户被纳入白名单。
+
+svn  yinhan/Paas_inf_Aqzzkw_$#!22 
+
+
+curl http://abs-api-staff.kf:8800/api/v2/cypher/updateRoleCypher?staffNumber=100C06
+
+$env:ANTHROPIC_AUTH_TOKEN="freecc"; $env:ANTHROPIC_BASE_URL="http://localhost:8082"; claude
+ANTHROPIC_AUTH_TOKEN="freecc" ANTHROPIC_BASE_URL="http://localhost:8082" claude
+
+
+如果有配合排查生产问题，或者其他没法关联到需求条目的任务 超过1小时的 就在这个条目下拆任务 记工作量
+“9065 BBOSS非需求条目任务(2026)”
+
+省两级接口新增非定向大流量开卡报备、定向语音功能白名单、免开卡审核白名单时，需限制灰名单证件编码在其限制省份新添加风险白名单；
+
+######灰名单输入证件编码数据加密存储；######
+沟通灰名单关联风险白名单的数据查询问题；
+
+添加客户经理为地市级的判断；
+定位及处理idc生成环境短信发送问题
+fix: 优化行业灰名单审批权限与待办查询范围
+fix(omss-maintenance): 优化行业灰名单导出查询口径与生效时间落库
+
+定位生成环境idc同谈项目工地单子不流转的问题；
+补充灰名单导入来源与省份联动校验；
+修复灰名单导出省份名称显示问题；
+新增灰名单批量导入来源角色校验；
+导出需要做数据权限判断；
+
+1-审批中 2-审批通过 3-退回修改 
+新增灰名单审批列表approvalStatus和节点名称字段；
+
+审批列表接口返回approvalStatus，并新增节点名称展示逻辑：
+待审批显示“省二级经理审批”，退回修改根据灰名单approvalStatus显示“退回修改”。
+修复灰名单审批状态与操作状态耦合问题；
+拆分审批状态与operType，统一直接删除与审批删除的失效时间更新，
+并避免状态更新时空endDate覆盖原有失效时间。
+优化灰名单审批状态管理；
+解决灰名单批量导入失败的问题；
+处理生产环境有些EC编码都不是top客户，但是被打标成为金牌标签的问题；
+更新Excel新模板适配及添加批量删除接口；
+
+yinhan/YinHan#Pro2
+
+更新处理批量导入模板信息配置错误的问题；
+更新idc短信模板id,短信发送参数调整;
+定位并解决查询功能有误客户限制省份查询结果与条件不符的问题；
+优化MyBatis SQL日志配置；
+
+
+http://10.248.50.225/smartreplyweb/#/qaz    admin/kYMue*q!qBrv
+
+https://ai.yiqiu.dev/v1
+
+
+与CMOT对接，定位和处理客户等级同步数据异常的问题
+feat(omss): 增加前1天失效同步等级的XXL-JOB日志记录
+
+https://www.hotaitool.net  yinhanxy@aliyun.com vVzxCdrim8Xm3HX
+https://ai.yiqiu.dev/    yinhanxy@aliyun.com vVzxCdrim8Xm3HX
+https://www.dmxapi.cn/
+
+fix: 对齐TOP客户失效同步与等级重分配接口
+
+调整TOP客户前一天失效同步入参，按客户维度传递 customerNumber/createStaff，并将前失效查询统一改为仅按失效时间窗口过滤。
+
+自动打标联调及上线支持；
+短信发送循环异常保护；
+
+合并代码至主线master分支
+
+配置导出功能的金库审批；
+与CMIOT对接，解决gz压缩文件的解析问题；
+定位及解决新增TOP看管用户之后客户信息未同步到cust的问题；
+优化 SyncCmiotBbossUserCountHandler 文件同步与日志记录；
+
+
+排查订单100A260415666219流程不驱动的问题
+排查订单100A260416666338新做的没有添加待阅的问题；
+修正签约省IDC业务管理员待阅创建逻辑；
+
+优化签约省IDC业务管理员待阅和短信发送逻辑
+
+2vM4h.CwpArZsmB
+
+curl --location --request GET 'http://10.248.50.225/absweb/zuul/api-customer/api/v2/cust/refreshOtherCache?cfgSection=CUST_OTHERCONFIG&cfgKey=TEMPLATE_FILE_GOLD_CAR'
+
+4A主帐号已经创建成功！具备B域、测试域使用权限，帐号为(dwyinhan)，初始密码为(V3_3#F3!zCiw)
+
+账号：yinhan
+密码：HEVyHDeKN8xc3UaAQv3F
+
+修正创建时间获取逻辑为订单的创建日期
+解决节点列表中过滤“等待一级业编处理”节点问题
+
+
+cust_param_cfgIDC集约化-信控暂停工单  暂停/恢复
+
+bpm流程更新，功能开发；
+
+自动打标功能更新至225环境；
+灰名单审批功能与前端联调并处理报错问题；
+定位并解决225环境调用接口报数据未初始化的问题；
+
+行业灰名单客户管理功能
+1 功能开发（新增，查询，批量导入/删除，批量导出）
+2 新增/删除时，根据角色判断是否发起审批
+3 在工单代办中开发灰名单的审批功能
+4 与前端联调
+
+
+现在的工作内容：
+ 1. 需求开发：CRM-ZQ-202512-16-金银牌客户等级自动打标需求；
+ 2. 需求开发：CRM-ZQ-202602-15-行业灰名单客户管控需求；
+ 3. 需求开发：CRM-ZQ-202602-03-IDC集约化-信控暂停工单流程优化及提醒短信内容优化
+目前的项目进展情况：
+1. 金银牌客户等级自动打标需求已经完成功能开发并在开发环境已经测试完，正在更新至预生产环境（225环境）进行联调及测试；
+2. 行业灰名单客户管控需求功能开发已完成70%，待与前端联调；
+3. 集约化-信控暂停工单流程优化及提醒短信内容优化，已经熟悉了代码，开发进度30%；
+
+
+项目组人员变化情况：
+无
+
+殷晗
+账号：yinhan
+密码：H1dm17UykHpe
+
+
+插入后可调用 /api/v2/cust/refreshOtherCache?cfgSection=CUST_OTHERCONFIG&cfgKey=TEMPLATE_FILE_GOLD_CAR 刷新缓存，无需重启服务。
+
+
+# 进入命令行界面，执行如下运行 Coding Tool Helper
+npx @z_ai/coding-helper
+
+mvn install:install-file -Dfile="D:\bboss\work\extjar\ojdbc6-11.2.0.3.jar" -DgroupId="com.oracle" -DartifactId="ojdbc6" -Dversion="11.2.0.3" -Dpackaging=jar
+
+
+172.19.30.150 数据库密码：用户greatdb 密码greatdb    abs_cust/EiQFlH%xu&
+
+BBOSS 短信 253740  000admin/4PmL9%rdVx#A    000admin/1qaz2wsx#EDC  000lisj/1qaz2wsx#EDC
+ 
+禅道账号  用户名是yinhan  密码都是 1qaz!QAZ           yinhan/1qaz!QAZ
+
+主机的用户名和密码
+appop:
+Paas_inf_Aqzzkw_123!
+
+数据库密码：用户greatdb 密码greatdb
+
+redis		话单	172.19.30.108:6379,172.19.30.108:6380,172.19.30.108:6381				8nKV_yV3tU05dtf
+		账单	172.19.30.109:6379,172.19.30.109:6380,172.19.30.109:6381				8nKV_yV3tU05dtf
+
+用户名自己的yinhan，密码都是abc123,,
+
+git config --global user.email "yinhanxy@aliyun.com"
+git config --global user.name "yinhan"
+ssh-keygen -t ed25519 -C "yinhan"
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHMPo4AvbY8XnhsJv32ukqp6Su0IAHdktBd8vbs1JFqJ yinhan
+
+
+F$Yf*85v2PPq8pL
